@@ -21,10 +21,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 奢華流金字體 */
         .gold-text {
             background: var(--gold-gradient);
             -webkit-background-clip: text;
@@ -34,7 +32,6 @@
             font-weight: 700;
         }
 
-        /* 呼吸發光邊框卡片 */
         .luxury-card {
             background: rgba(15, 15, 15, 0.85);
             border: 1px solid rgba(191, 149, 63, 0.2);
@@ -51,7 +48,6 @@
             50% { border-color: rgba(191, 149, 63, 0.5); box-shadow: 0 0 35px rgba(191, 149, 63, 0.15); }
         }
 
-        /* 按鈕：4秒週期從暗金轉亮金 */
         .btn-luxury-cycle {
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid #8A6E2F;
@@ -59,8 +55,6 @@
             padding: 12px;
             font-size: 13px;
             font-weight: 500;
-            letter-spacing: 0.1em;
-            transition: all 0.3s ease;
             animation: btn-glow-cycle 4s infinite;
         }
 
@@ -69,85 +63,75 @@
             50% { color: #FCF6BA; border-color: #FCF6BA; box-shadow: 0 0 20px rgba(252, 246, 186, 0.3); }
         }
 
-        /* 集點卡點位樣式 */
         .stamp-slot {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+            width: 45px; height: 45px; border-radius: 50%;
             border: 1px solid rgba(191, 149, 63, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
             background: rgba(255, 255, 255, 0.03);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s ease;
         }
 
         .stamp-active {
             background: var(--gold-gradient);
             color: #000;
-            border: none;
             box-shadow: 0 0 15px rgba(252, 246, 186, 0.6);
             transform: scale(1.1);
-        }
-
-        /* 進度條發光 */
-        .progress-glow {
-            box-shadow: 0 0 12px rgba(252, 246, 186, 0.5);
+            border: none;
         }
     </style>
 </head>
-<body class="py-8 px-5">
+<body class="py-6 px-5">
 
-    <header class="text-center mb-8">
-        <h1 class="text-3xl gold-text mb-1">美業升等集點卡</h1>
-        <p class="text-[9px] tracking-[0.4em] text-gray-600 uppercase">Automated Loyalty Ecosystem</p>
+    <header class="text-center mb-6">
+        <h1 class="text-2xl gold-text mb-1">美業升等集點卡</h1>
+        <p class="text-[9px] tracking-[0.4em] text-gray-600 uppercase">Premium Loyalty System</p>
     </header>
 
-    <main class="w-full max-w-md space-y-6">
+    <main class="w-full max-w-md space-y-5">
         
         <section class="luxury-card p-6">
-            <div class="flex justify-between items-end mb-4">
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="w-12 h-12 rounded-full border border-[#BF953F] flex items-center justify-center bg-black">
+                    <span class="gold-text text-xl">✦</span>
+                </div>
                 <div>
-                    <span class="text-[10px] text-gray-500 tracking-widest uppercase">目前等級</span>
-                    <h2 id="tier-display" class="text-2xl gold-text">載入中...</h2>
+                    <h2 id="client-name" class="text-lg font-bold text-white tracking-wide">載入中...</h2>
+                    <p id="client-phone" class="text-xs text-gray-500 font-mono">0900-000-000</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-end mb-3">
+                <div>
+                    <span class="text-[10px] text-gray-500 uppercase">會員等級</span>
+                    <h3 id="tier-display" class="text-xl gold-text">等級 0 入門會員</h3>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] text-gray-500 uppercase">年度累積消費</span>
-                    <p id="total-spent" class="text-lg text-white font-light">$0</p>
+                    <span class="text-[10px] text-gray-500 uppercase">累積消費</span>
+                    <p id="total-spent" class="text-lg text-white">$0</p>
                 </div>
             </div>
 
-            <div class="w-full h-2 bg-gray-900 rounded-full mb-3 overflow-hidden border border-white/5">
-                <div id="progress-bar" class="h-full bg-gradient-to-r from-[#BF953F] to-[#FCF6BA] rounded-full transition-all duration-1000 progress-glow" style="width: 0%"></div>
+            <div class="w-full h-1.5 bg-gray-900 rounded-full mb-2 overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-[#BF953F] to-[#FCF6BA] rounded-full transition-all duration-1000" style="width: 0%"></div>
             </div>
-            
-            <div class="flex justify-between text-[10px] text-gray-600 font-mono mb-4">
-                <span>$0</span>
-                <span id="target-threshold">$10,000</span>
-            </div>
-
-            <div id="incentive-box" class="p-3 bg-white/5 rounded-xl border border-white/5 text-center">
-                <p id="incentive-text" class="text-[11px] text-gray-400 italic">計算中...</p>
-            </div>
+            <p id="incentive-text" class="text-[11px] text-gray-500 italic text-center mb-2"></p>
         </section>
 
         <section class="luxury-card p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="gold-text text-sm tracking-widest">剪髮集點：10 送 1</h3>
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="gold-text text-xs tracking-widest uppercase">剪髮集點紀錄</h3>
                 <span id="stamp-count" class="text-xs font-mono text-gray-500">0 / 10</span>
             </div>
-            
-            <div id="stamp-grid" class="grid grid-cols-5 gap-y-6 gap-x-2 justify-items-center">
+            <div id="stamp-grid" class="grid grid-cols-5 gap-4 justify-items-center">
                 </div>
         </section>
 
         <section class="luxury-card p-6 border-dashed border-[#BF953F]/40">
-            <p class="text-[10px] text-gray-600 text-center uppercase mb-4 tracking-tighter">店員核銷與模擬結帳</p>
+            <p class="text-[10px] text-gray-600 text-center uppercase mb-4 tracking-tighter">店員操作介面</p>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="simulateTransaction(3000)" class="btn-luxury-cycle col-span-2">結帳 $3,000 (增加進度與集點)</button>
-                <button onclick="handleCheckin()" class="btn-luxury-cycle">單次剪髮核銷</button>
-                <button onclick="resetDemo()" class="btn-luxury-cycle text-red-800">重設數據</button>
+                <button onclick="simulateTransaction(1500)" class="btn-luxury-cycle col-span-2">單次服務結帳 ($1,500)</button>
+                <button onclick="handleCheckin()" class="btn-luxury-cycle">手動集點</button>
+                <button onclick="resetDemo()" class="btn-luxury-cycle text-red-900 border-red-900/30">重置帳號</button>
             </div>
         </section>
     </main>
@@ -156,7 +140,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase 配置 (已套用您的金鑰)
         const firebaseConfig = {
             apiKey: "AIzaSyCOhBN9TH3UJSOSx5XVyQ08f_2RUckvXYU",
             authDomain: "holyhairsalon-f73bf.firebaseapp.com",
@@ -170,110 +153,87 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const userId = "MEMBER_DEMO_001";
+        const userId = "MEMBER_USER_001";
         const userRef = doc(db, "customers", userId);
 
-        // 升等規則配置表
-        const TIER_CONFIG = {
-            "銀卡會員": { min: 0, next: "金卡會員", threshold: 10000, reward: "全店 95 折" },
-            "金卡會員": { min: 10000, next: "白金會員", threshold: 30000, reward: "全店 9 折 + 免費洗髮" },
-            "白金會員": { min: 30000, next: "至尊鑽石", threshold: 99999, reward: "全店 85 折 + 專屬設計師" }
-        };
+        const RULES = [
+            { level: 0, name: "入門會員", threshold: 1000 },
+            { level: 1, name: "基礎會員", threshold: 3000 },
+            { level: 2, name: "熟客會員", threshold: 5000 },
+            { level: 3, name: "優選會員", threshold: 7000 },
+            { level: 4, name: "菁英會員", threshold: 10000 },
+            { level: 5, name: "尊榮會員", threshold: 999999 }
+        ];
 
-        // 實時數據監聽 (UI 自動化)
         onSnapshot(userRef, (snap) => {
-            if (snap.exists()) {
-                const data = snap.data();
-                updateUI(data);
-            } else {
-                initUser();
-            }
+            if (snap.exists()) updateUI(snap.data());
+            else initUser();
         });
 
         function updateUI(data) {
-            const config = TIER_CONFIG[data.tier] || TIER_CONFIG["銀卡會員"];
-            
-            // 1. 更新進度條
-            document.getElementById('tier-display').innerText = data.tier;
+            document.getElementById('client-name').innerText = data.name;
+            document.getElementById('client-phone').innerText = data.phone;
             document.getElementById('total-spent').innerText = `$${data.total_spent.toLocaleString()}`;
-            document.getElementById('target-threshold').innerText = `$${config.threshold.toLocaleString()}`;
             
-            const progress = (data.total_spent / config.threshold) * 100;
-            document.getElementById('progress-bar').style.width = `${Math.min(progress, 100)}%`;
-            
-            // 2. 更新激勵文案 (Gamification)
-            const diff = config.threshold - data.total_spent;
-            if (diff > 0) {
-                document.getElementById('incentive-text').innerHTML = `💡 只差 <span class="text-white">$${diff.toLocaleString()}</span> 即可升等為【${config.next}】！<br>升等後享 ${config.reward}`;
-            } else {
-                document.getElementById('incentive-text').innerHTML = `✨ 您已達成 ${data.tier} 最高權益！`;
+            // 自動計算等級
+            let currentTier = RULES[0];
+            for (let rule of RULES) {
+                if (data.total_spent >= (RULES[rule.level - 1]?.threshold || 0)) {
+                    currentTier = rule;
+                }
             }
 
-            // 3. 更新集點卡 (視覺化)
+            document.getElementById('tier-display').innerText = `等級 ${currentTier.level} ${currentTier.name}`;
+            
+            const nextTier = RULES[currentTier.level + 1];
+            if (nextTier) {
+                const progress = (data.total_spent / nextTier.threshold) * 100;
+                document.getElementById('progress-bar').style.width = `${Math.min(progress, 100)}%`;
+                document.getElementById('incentive-text').innerText = `再消費 $${(nextTier.threshold - data.total_spent).toLocaleString()} 即可升等至 ${nextTier.name}`;
+            } else {
+                document.getElementById('progress-bar').style.width = `100%`;
+                document.getElementById('incentive-text').innerText = `您已達成最高等級【${currentTier.name}】`;
+            }
+
+            // 集點卡渲染
             document.getElementById('stamp-count').innerText = `${data.stamps} / 10`;
             const grid = document.getElementById('stamp-grid');
             grid.innerHTML = '';
             for (let i = 1; i <= 10; i++) {
-                const slot = document.createElement('div');
-                slot.className = `stamp-slot ${i <= data.stamps ? 'stamp-active' : ''}`;
-                slot.innerHTML = i <= data.stamps ? '✦' : i;
-                grid.appendChild(slot);
+                grid.innerHTML += `<div class="stamp-slot ${i <= data.stamps ? 'stamp-active' : ''}">${i <= data.stamps ? '✦' : ''}</div>`;
             }
         }
 
-        // 核心自動化邏輯：結帳後檢查升等
         window.simulateTransaction = async (amount) => {
             const snap = await getDoc(userRef);
             const data = snap.data();
-            
-            let newTotal = data.total_spent + amount;
-            let newStamps = data.stamps + 1; // 假設結帳一次集一點
-            let newTier = data.tier;
-
-            // 升等檢查器
-            const config = TIER_CONFIG[data.tier];
-            if (newTotal >= config.threshold) {
-                newTier = config.next;
-                alert(`🎊 恭喜升等！您已晉升為【${newTier}】\n解鎖回饋：${TIER_CONFIG[newTier].reward}`);
-            }
-
-            // 集點滿額檢查
-            if (newStamps >= 10) {
-                newStamps = 0;
-                alert("🎁 集點達成！已自動存入「免費剪髮券」乙張！");
-            }
-
-            await updateDoc(userRef, {
-                total_spent: newTotal,
-                stamps: newStamps,
-                tier: newTier,
-                last_updated: Date.now()
-            });
+            let newSpent = data.total_spent + amount;
+            let newStamps = data.stamps + 1;
+            if (newStamps > 10) newStamps = 0;
+            await updateDoc(userRef, { total_spent: newSpent, stamps: newStamps });
         };
 
         window.handleCheckin = async () => {
             const snap = await getDoc(userRef);
-            const data = snap.data();
-            let newStamps = data.stamps + 1;
-            if (newStamps > 10) newStamps = 1; // 循環
-            await updateDoc(userRef, { stamps: newStamps });
+            await updateDoc(userRef, { stamps: Math.min(snap.data().stamps + 1, 10) });
         };
 
         window.resetDemo = async () => {
             await setDoc(userRef, {
+                name: "王小明",
+                phone: "0912-345-678",
                 total_spent: 0,
                 stamps: 0,
-                tier: "銀卡會員",
-                join_date: Date.now()
+                tier: 0
             });
         };
 
         async function initUser() {
             await setDoc(userRef, {
-                total_spent: 7000,
-                stamps: 7,
-                tier: "銀卡會員",
-                join_date: Date.now()
+                name: "王小明",
+                phone: "0912-345-678",
+                total_spent: 850,
+                stamps: 3
             });
         }
     </script>
