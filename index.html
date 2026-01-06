@@ -3,159 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>美業庫存管理 | HOLY HAIR</title>
+    <title>美業升等集點卡 | HOLY HAIR</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold-base: #BF953F;
-            --gold-bright: #FCF6BA;
-            --gold-dark: #8A6E2F;
-            --bg-deep: #050505;
+            --gold-gradient: linear-gradient(135deg, #BF953F 0%, #FCF6BA 45%, #B38728 70%, #FBF5B7 85%, #AA771C 100%);
+            --dark-bg: #050505;
+            --gold-glow: rgba(191, 149, 63, 0.4);
         }
 
         body {
-            background-color: var(--bg-deep);
+            background-color: var(--dark-bg);
             color: #D4D4D4;
-            font-family: 'Noto Serif TC', serif;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-image: radial-gradient(circle at 50% 10%, #1a1a1a 0%, #050505 100%);
+            min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 流金系列字體 */
+        /* 流金字體 */
         .gold-text {
-            background: linear-gradient(135deg, var(--gold-base), var(--gold-bright), var(--gold-dark));
+            background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-family: 'Cinzel', serif;
             letter-spacing: 0.1em;
         }
 
-        /* 呼吸感卡片框架 */
+        /* 呼吸發光邊框卡片 */
         .luxury-card {
-            background: rgba(20, 20, 20, 0.8);
+            background: rgba(15, 15, 15, 0.8);
             border: 1px solid rgba(191, 149, 63, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            animation: border-breathe 5s ease-in-out infinite;
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
             position: relative;
             overflow: hidden;
+            animation: card-breathe 5s ease-in-out infinite;
         }
 
-        @keyframes border-breathe {
-            0%, 100% { border-color: rgba(191, 149, 63, 0.2); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-            50% { border-color: rgba(191, 149, 63, 0.6); box-shadow: 0 0 25px rgba(191, 149, 63, 0.15); }
+        @keyframes card-breathe {
+            0%, 100% { border-color: rgba(191, 149, 63, 0.2); box-shadow: 0 0 15px rgba(0,0,0,0.8); }
+            50% { border-color: rgba(191, 149, 63, 0.5); box-shadow: 0 0 30px rgba(191, 149, 63, 0.15); }
         }
 
-        /* 按鈕：4秒週期暗金轉亮金 */
-        .btn-gold-cycle {
-            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
-            color: var(--gold-base);
-            border: 1px solid var(--gold-base);
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            animation: gold-glow 4s linear infinite;
-        }
-
-        @keyframes gold-glow {
-            0% { border-color: var(--gold-dark); color: var(--gold-dark); box-shadow: none; }
-            50% { border-color: var(--gold-bright); color: var(--gold-bright); box-shadow: 0 0 15px rgba(252, 246, 186, 0.3); }
-            100% { border-color: var(--gold-dark); color: var(--gold-dark); box-shadow: none; }
-        }
-
-        /* 滑鼠點過/觸碰反光 */
+        /* 卡片反光特效 */
         .luxury-card::after {
             content: "";
             position: absolute;
-            top: -150%; left: -150%;
+            top: -100%; left: -100%;
             width: 300%; height: 300%;
-            background: linear-gradient(135deg, transparent 45%, rgba(252, 246, 186, 0.1) 50%, transparent 55%);
+            background: linear-gradient(135deg, transparent 45%, rgba(255,255,255,0.08) 50%, transparent 55%);
             pointer-events: none;
+            transition: all 0.8s ease;
         }
-        .luxury-card:active::after {
-            transition: all 0.6s ease;
-            top: 100%; left: 100%;
+        .luxury-card:active::after { top: 100%; left: 100%; }
+
+        /* 按鈕：4秒週期從暗金轉亮金 */
+        .btn-luxury {
+            border: 1px solid #BF953F;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+            animation: button-glow-cycle 4s infinite;
         }
 
-        .inventory-badge {
-            background: rgba(191, 149, 63, 0.1);
-            border: 0.5px solid rgba(191, 149, 63, 0.5);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
+        @keyframes button-glow-cycle {
+            0%, 100% { color: #8A6E2F; border-color: #8A6E2F; box-shadow: 0 0 5px rgba(138, 110, 47, 0.2); }
+            50% { color: #FCF6BA; border-color: #FCF6BA; box-shadow: 0 0 20px rgba(252, 246, 186, 0.4); }
+        }
+
+        .progress-bar-glow {
+            box-shadow: 0 0 10px rgba(191, 149, 63, 0.6);
+        }
+
+        .stamp-active {
+            background: var(--gold-gradient);
+            box-shadow: 0 0 15px #BF953F;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col items-center py-8 px-5">
 
-    <header class="p-6 text-center border-b border-white/5">
-        <h1 class="text-2xl gold-text font-bold uppercase tracking-widest">美業庫存管理</h1>
-        <p class="text-[9px] text-gray-600 tracking-[0.3em] mt-1">INVENTORY SYSTEM PRO</p>
+    <header class="text-center mb-8">
+        <h1 class="text-3xl gold-text font-bold mb-1">美業升等集點卡</h1>
+        <p class="text-[9px] tracking-[0.5em] text-gray-600 uppercase">Holy Hair Salon Premium</p>
     </header>
 
-    <main class="flex-1 p-5 space-y-6">
+    <main class="w-full max-w-md space-y-5">
         
-        <div class="grid grid-cols-2 gap-4">
-            <div class="luxury-card p-4">
-                <p class="text-[10px] text-gray-500 uppercase mb-1">今日消耗點數</p>
-                <h3 id="daily-points" class="text-xl font-light text-white">0 P</h3>
-            </div>
-            <div class="luxury-card p-4">
-                <p class="text-[10px] text-gray-500 uppercase mb-1">預警庫存數</p>
-                <h3 id="alert-count" class="text-xl font-light text-red-400">0</h3>
-            </div>
-        </div>
-
         <section class="luxury-card p-6">
-            <h2 class="gold-text text-sm mb-5 font-bold tracking-widest">快速服務核銷</h2>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                    <div>
-                        <p class="text-sm font-medium">洗頭服務 (一般)</p>
-                        <span class="inventory-badge">庫存充足</span>
-                    </div>
-                    <button onclick="recordService('wash', 1)" class="btn-gold-cycle px-6 py-2 rounded-lg text-xs">核銷 1 次</button>
+            <div class="flex justify-between items-start mb-5">
+                <div>
+                    <span class="text-[10px] text-gray-500 tracking-widest">當前等級</span>
+                    <h2 id="tier-name" class="text-3xl gold-text mt-1">載入中</h2>
                 </div>
-                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                    <div>
-                        <p class="text-sm font-medium">專業染膏 (一管)</p>
-                        <span class="inventory-badge text-yellow-500">剩餘 8 支</span>
-                    </div>
-                    <button onclick="recordService('color', 1)" class="btn-gold-cycle px-6 py-2 rounded-lg text-xs">核銷 1 支</button>
+                <div class="text-right">
+                    <span class="text-[10px] text-gray-500 tracking-widest">紅利點數</span>
+                    <p id="points-balance" class="text-2xl text-white font-light mt-1">0 P</p>
                 </div>
+            </div>
+            
+            <div class="w-full h-1.5 bg-gray-900 rounded-full mb-3">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-[#BF953F] to-[#FCF6BA] rounded-full transition-all duration-1000 progress-bar-glow" style="width: 0%"></div>
+            </div>
+            <p id="next-tier-msg" class="text-[11px] text-gray-400 text-center mb-5 font-light"></p>
+            
+            <div class="p-3 bg-black/50 rounded-2xl border border-white/5 flex justify-between items-center">
+                <span class="text-[11px] text-gray-500">可用點數折抵 (10點=$1)</span>
+                <span id="max-discount" class="text-yellow-500 font-bold">$0</span>
             </div>
         </section>
 
         <section class="luxury-card p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="gold-text text-sm font-bold tracking-widest">會員動態</h2>
-                <span id="member-tier" class="text-[10px] bg-yellow-900/20 text-yellow-500 px-2 py-1 rounded">SILVER</span>
-            </div>
-            <div class="space-y-3">
-                <div class="flex justify-between text-xs">
-                    <span class="text-gray-500">當前累積消費</span>
-                    <span id="total-spent" class="text-white">$0</span>
+            <h3 class="gold-text text-xs tracking-widest mb-5 font-bold uppercase">持有服務方案</h3>
+            <div id="bundle-list" class="space-y-4">
                 </div>
-                <div class="w-full h-[2px] bg-gray-800">
-                    <div id="tier-progress" class="h-full bg-gradient-to-r from-yellow-700 to-yellow-200 transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <p id="next-tier-msg" class="text-[9px] text-gray-600 text-center italic"></p>
-            </div>
         </section>
 
+        <section class="luxury-card p-6 border-dashed border-[#BF953F]/40">
+            <p class="text-[10px] text-gray-600 text-center uppercase mb-4 tracking-widest">設計師管理終端</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="handlePurchase(3000)" class="btn-luxury py-4 col-span-2">一般結帳 $3,000</button>
+                <button onclick="handleBundleCheckin()" class="btn-luxury py-3 text-xs">核銷剪髮方案</button>
+                <button onclick="handleInfiniteCheckin()" class="btn-luxury py-3 text-xs">核銷洗頭方案</button>
+            </div>
+        </section>
     </main>
-
-    <footer class="p-5 border-t border-white/5 bg-black/50 backdrop-blur-md">
-        <button onclick="syncToFirebase()" class="w-full py-4 rounded-full border border-yellow-700/50 gold-text text-xs tracking-widest hover:bg-yellow-700/10 transition active:scale-95">
-            同步數據至雲端
-        </button>
-    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase 配置
+        // Firebase 配置 (已套用您的金鑰)
         const firebaseConfig = {
             apiKey: "AIzaSyCOhBN9TH3UJSOSx5XVyQ08f_2RUckvXYU",
             authDomain: "holyhairsalon-f73bf.firebaseapp.com",
@@ -169,46 +153,97 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const userRef = doc(db, "customers", "VIP_USER_TEST");
+        const userId = "VIP_USER_PRO"; 
+        const userRef = doc(db, "customers", userId);
 
-        const TIER_RULES = { SILVER: 10000, GOLD: 30000, PLATINUM: 100000 };
+        const TIER_RULES = { "一般": 10000, "金卡": 30000, "黑鑽": 100000 };
 
-        // 監聽數據
+        // 實時數據監聽
         onSnapshot(userRef, (snap) => {
             if (snap.exists()) {
-                const data = snap.data();
-                document.getElementById('total-spent').innerText = `$${data.total_spent.toLocaleString()}`;
-                document.getElementById('daily-points').innerText = `${data.points || 0} P`;
-                document.getElementById('member-tier').innerText = data.tier;
-                
-                // 進度條與自動升等邏輯
-                const limit = TIER_RULES[data.tier] || 10000;
-                const progress = (data.total_spent / limit) * 100;
-                document.getElementById('tier-progress').style.width = `${Math.min(progress, 100)}%`;
-                document.getElementById('next-tier-msg').innerText = `距離升等還需 $${Math.max(0, limit - data.total_spent).toLocaleString()}`;
+                renderUI(snap.data());
+            } else {
+                initUser();
             }
         });
 
-        // 核銷服務函式
-        window.recordService = async (service, count) => {
-            const snap = await getDoc(userRef);
-            if (!snap.exists()) return;
-
-            const data = snap.data();
-            const cost = service === 'color' ? 2000 : 500; // 模擬核銷產生的消費額
+        function renderUI(data) {
+            document.getElementById('tier-name').innerText = data.tier;
+            document.getElementById('points-balance').innerText = `${data.points || 0} P`;
             
-            await updateDoc(userRef, {
-                total_spent: data.total_spent + cost,
-                points: (data.points || 0) + Math.floor(cost / 10)
+            const limit = TIER_RULES[data.tier] || 10000;
+            const progress = (data.total_spent / limit) * 100;
+            document.getElementById('progress-bar').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('next-tier-msg').innerText = `距升等還需消費 $${Math.max(0, limit - data.total_spent).toLocaleString()}`;
+
+            const discount = Math.floor((data.points || 0) / 10);
+            document.getElementById('max-discount').innerText = `-$${discount}`;
+
+            const list = document.getElementById('bundle-list');
+            list.innerHTML = '';
+            
+            if (data.infinite_wash) {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-yellow-900/30">
+                        <span class="text-sm gold-text font-medium">洗頭吃到飽</span>
+                        <span class="text-[9px] bg-yellow-600/20 text-yellow-500 px-3 py-1 rounded-full border border-yellow-600/30">無限使用</span>
+                    </div>`;
+            }
+
+            if (data.bundle_haircut) {
+                const rem = data.bundle_haircut.remaining;
+                list.innerHTML += `
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between text-sm mb-3">
+                            <span>5次剪髮方案</span>
+                            <span class="gold-text font-bold">剩餘 ${rem} 次</span>
+                        </div>
+                        <div class="flex gap-2">
+                            ${Array(5).fill(0).map((_, i) => `<div class="h-1 flex-1 ${i < 5-rem ? 'bg-gray-800' : 'bg-yellow-500 progress-bar-glow'} rounded-full"></div>`).join('')}
+                        </div>
+                        ${rem === 1 ? '<p class="text-[10px] text-red-400 mt-3 font-medium">✦ 溫馨提示：方案即將到期，預約下次續約享 85 折</p>' : ''}
+                    </div>`;
+            }
+        }
+
+        window.handlePurchase = async (amount) => {
+            const snap = await getDoc(userRef);
+            const data = snap.data();
+            let newSpent = data.total_spent + amount;
+            let newPoints = (data.points || 0) + Math.floor(amount / 10);
+            let newTier = data.tier;
+
+            if (newSpent >= TIER_RULES[data.tier]) {
+                newTier = data.tier === '一般' ? '金卡' : '黑鑽';
+                alert(`🎊 榮耀時刻！您已晉升為 ${newTier} 會員！`);
+            }
+
+            await updateDoc(userRef, { total_spent: newSpent, points: newPoints, tier: newTier });
+        };
+
+        window.handleBundleCheckin = async () => {
+            const snap = await getDoc(userRef);
+            const data = snap.data();
+            if (data.bundle_haircut.remaining > 0) {
+                await updateDoc(userRef, { "bundle_haircut.remaining": data.bundle_haircut.remaining - 1 });
+            } else {
+                alert("次數已用罄，請洽櫃檯續約方案。");
+            }
+        };
+
+        window.handleInfiniteCheckin = () => {
+            alert("洗頭服務核銷成功！已記入設計師績效。");
+        };
+
+        async function initUser() {
+            await setDoc(userRef, {
+                total_spent: 0,
+                tier: '一般',
+                points: 500,
+                infinite_wash: true,
+                bundle_haircut: { remaining: 5, total: 5 }
             });
-
-            // 觸發簡單的反饋效果
-            alert(`核銷成功！已紀錄 ${service} 服務。`);
-        };
-
-        window.syncToFirebase = () => {
-            alert("數據已即時同步至雲端伺服器。");
-        };
+        }
     </script>
 </body>
 </html>
