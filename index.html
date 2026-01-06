@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>美業升等集點卡</title>
+    <title>HOLY HAIR | 智能美業系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
     <style>
@@ -11,13 +11,18 @@
         body { background-color: var(--dark-bg); color: #D4D4D4; font-family: 'Noto Sans TC', sans-serif; background-image: radial-gradient(circle at 50% 10%, #1a1a1a 0%, #050505 100%); min-height: 100vh; padding-bottom: 90px; }
         .gold-text-fancy { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Cinzel', serif; letter-spacing: 0.15em; font-weight: 700; }
         .gold-text-btn { color: #BF953F; font-weight: 600; letter-spacing: 0.1em; }
-        .luxury-card { background: rgba(20, 20, 20, 0.7); border: 1px solid rgba(191, 149, 63, 0.15); backdrop-filter: blur(25px); border-radius: 28px; transition: all 0.4s ease; }
+        .luxury-card { background: rgba(20, 20, 20, 0.7); border: 1px solid rgba(191, 149, 63, 0.15); backdrop-filter: blur(25px); border-radius: 28px; }
         input, select { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(191, 149, 63, 0.2); color: white; padding: 12px; border-radius: 12px; outline: none; }
         .btn-luxury { background: rgba(0, 0, 0, 0.6); border: 1px solid #8A6E2F; border-radius: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-luxury:active { transform: scale(0.95); }
         .stamp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .stamp-slot { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(191, 149, 63, 0.15); display: flex; align-items: center; justify-content: center; font-size: 10px; background: rgba(255,255,255,0.02); }
         .stamp-active { background: var(--gold-gradient); color: #000; border: none; box-shadow: 0 0 15px rgba(191, 149, 63, 0.4); }
+        
+        /* 倉庫分類標籤樣式 */
+        .filter-tab { font-size: 10px; padding: 8px 12px; border-radius: 20px; border: 1px solid rgba(191,149,63,0.2); color: #666; transition: 0.3s; }
+        .filter-tab.active { background: var(--gold-gradient); color: #000; border: none; font-weight: bold; }
+
         .hidden-card { opacity: 0; transform: translateY(20px); pointer-events: none; height: 0; overflow: hidden; }
         .show-card { opacity: 1; transform: translateY(0); pointer-events: auto; height: auto; }
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(5,5,5,0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(191, 149, 63, 0.2); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
@@ -29,8 +34,8 @@
 
     <div id="page-member" class="page-content py-6">
         <header class="text-center mb-6">
-            <h1 class="text-3xl gold-text-fancy mb-1">美業升等集點卡</h1>
-            <p class="text-[9px] tracking-[0.5em] text-gray-600 uppercase">Intelligent Search</p>
+            <h1 class="text-3xl gold-text-fancy mb-1">美業管理系統</h1>
+            <p class="text-[9px] tracking-[0.5em] text-gray-600 uppercase">Premium Intelligence</p>
         </header>
 
         <section class="luxury-card p-6 mb-4">
@@ -61,7 +66,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full h-1 bg-black rounded-full mb-4 overflow-hidden"><div id="progress-bar" class="h-full bg-gradient-to-r from-[#BF953F] to-[#FCF6BA]" style="width: 0%"></div></div>
                 <div class="stamp-grid" id="stamp-container"></div>
             </section>
 
@@ -82,8 +86,17 @@
     </div>
 
     <div id="page-list" class="page-content py-6 hidden">
-        <header class="text-center mb-6"><h1 class="text-2xl gold-text-fancy">會員倉庫</h1></header>
-        <div id="member-directory" class="space-y-4 pb-20"></div>
+        <header class="text-center mb-6">
+            <h1 class="text-2xl gold-text-fancy mb-4">會員倉庫</h1>
+            <div class="flex justify-center gap-2 mb-6 flex-wrap">
+                <button class="filter-tab active" onclick="setFilter('all', this)">全部名單</button>
+                <button class="filter-tab" onclick="setFilter('wash', this)">洗髮卡名單</button>
+                <button class="filter-tab" onclick="setFilter('haircut', this)">剪髮卡名單</button>
+                <button class="filter-tab" onclick="setFilter('stamps', this)">集點中名單</button>
+            </div>
+            <input type="text" id="search-input" placeholder="🔍 搜尋姓名或電話..." class="w-full text-xs" oninput="renderDirectory()">
+        </header>
+        <div id="member-directory" class="space-y-4 pb-24"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -98,20 +111,27 @@
         const firebaseConfig = { apiKey: "AIzaSyCOhBN9TH3UJSOSx5XVyQ08f_2RUckvXYU", databaseURL: "https://holyhairsalon-f73bf-default-rtdb.firebaseio.com", projectId: "holyhairsalon-f73bf" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
         let activeUserId = "";
+        let currentFilter = "all";
+
+        // --- 倉庫分類切換 ---
+        window.setFilter = (filter, el) => {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderDirectory();
+        };
 
         // --- 核心邏輯：智能搜尋 ---
-        window.triggerSmartSearch = async () => {
-            const nameInput = document.getElementById('reg-name').value.trim();
-            const phoneInput = document.getElementById('reg-phone').value.trim();
+        window.triggerSmartSearch = async (preName = "", prePhone = "") => {
+            const nameInput = preName || document.getElementById('reg-name').value.trim();
+            const phoneInput = prePhone || document.getElementById('reg-phone').value.trim();
             const statusLabel = document.getElementById('search-status');
             const actionBtn = document.getElementById('main-action-btn');
             const displayArea = document.getElementById('data-display-area');
 
-            if (nameInput.length < 1) {
-                resetUI();
-                return;
-            }
+            if (nameInput.length < 1) { resetUI(); return; }
 
             const snap = await get(ref(db, 'members'));
             if (!snap.exists()) return;
@@ -125,13 +145,10 @@
                 displayArea.classList.remove('show-card');
                 activeUserId = "";
             } else if (matches.length === 1) {
-                // 唯一匹配
                 statusLabel.innerText = "✅ 已找到會員資料";
-                actionBtn.querySelector('span').innerText = "更新/儲存當前資料";
                 loadMemberData(matches[0].id);
             } else {
-                // 同名同姓，需要電話二次確認
-                statusLabel.innerText = `⚠️ 發現 ${matches.length} 位同名者，請輸入電話確認`;
+                statusLabel.innerText = `⚠️ 發現 ${matches.length} 位同名者，請確認電話`;
                 const exactMatch = matches.find(m => m.phone === phoneInput);
                 if (exactMatch) {
                     statusLabel.innerText = "✅ 電話驗證成功";
@@ -146,15 +163,12 @@
         function loadMemberData(id) {
             activeUserId = id;
             document.getElementById('data-display-area').classList.add('show-card');
-            onValue(ref(db, 'members/' + id), (snap) => {
-                if(snap.exists()) updateUI(snap.val());
-            });
+            onValue(ref(db, 'members/' + id), (snap) => { if(snap.exists()) updateUI(snap.val()); });
         }
 
         function resetUI() {
             document.getElementById('data-display-area').classList.remove('show-card');
             document.getElementById('search-status').innerText = "請輸入姓名以調取資料...";
-            document.getElementById('main-action-btn').querySelector('span').innerText = "建立新會員卡";
             activeUserId = "";
         }
 
@@ -168,16 +182,59 @@
             for(let i=1; i<=10; i++) container.innerHTML += `<div class="stamp-slot ${i <= (data.stamps || 0) ? 'stamp-active' : ''}">${i <= (data.stamps || 0) ? '✦' : i}</div>`;
         }
 
-        // --- 其餘功能與之前相同 ---
+        // --- 倉庫渲染與過濾 ---
+        window.renderDirectory = async () => {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const snap = await get(ref(db, 'members'));
+            const container = document.getElementById('member-directory');
+            container.innerHTML = "";
+
+            if(snap.exists()){
+                Object.values(snap.val()).forEach(m => {
+                    // 1. 關鍵字搜尋過濾
+                    if(!m.name.toLowerCase().includes(search) && !m.phone.includes(search)) return;
+                    
+                    // 2. 分類過濾
+                    if(currentFilter === 'wash' && !(m.wash_tickets > 0)) return;
+                    if(currentFilter === 'haircut' && !(m.haircut_tickets > 0)) return;
+                    if(currentFilter === 'stamps' && !(m.stamps > 0)) return;
+
+                    const item = document.createElement('div');
+                    item.className = "luxury-card p-4 flex justify-between items-center";
+                    item.innerHTML = `
+                        <div class="flex flex-col">
+                            <span class="gold-text-btn">${m.name}</span>
+                            <span class="text-[9px] text-gray-500 font-mono">${m.phone}</span>
+                            <div class="flex gap-1 mt-1">
+                                ${m.wash_tickets > 0 ? '<span class="text-[8px] text-purple-400">洗×'+m.wash_tickets+'</span>' : ''}
+                                ${m.haircut_tickets > 0 ? '<span class="text-[8px] text-blue-400">剪×'+m.haircut_tickets+'</span>' : ''}
+                                ${m.stamps > 0 ? '<span class="text-[8px] text-yellow-500">點×'+m.stamps+'</span>' : ''}
+                            </div>
+                        </div>
+                        <button onclick="selectAndReturn('${m.name}', '${m.phone}')" class="text-[10px] gold-text-btn border border-[#BF953F]/30 px-4 py-2 rounded-full">選取</button>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+        };
+
+        window.selectAndReturn = (name, phone) => {
+            document.getElementById('reg-name').value = name;
+            document.getElementById('reg-phone').value = phone;
+            switchPage('member');
+            triggerSmartSearch(name, phone);
+        };
+
+        // --- 基礎操作 ---
         window.registerNewMember = async () => {
-            if (activeUserId) { alert("此會員已存在，資料已同步"); return; }
+            if (activeUserId) return alert("會員已存在");
             const name = document.getElementById('reg-name').value;
             const phone = document.getElementById('reg-phone').value;
-            if(!name || !phone) return alert("請填寫姓名與電話");
+            if(!name || !phone) return alert("請完整輸入");
             const snap = await get(ref(db, 'members'));
             const id = String((snap.exists() ? Object.keys(snap.val()).length : 0) + 1).padStart(3, '0');
             await set(ref(db, 'members/' + id), { id, name, phone, stamps: 0, total_spent: 0, haircut_tickets: 0, wash_tickets: 0 });
-            triggerSmartSearch();
+            triggerSmartSearch(name, phone);
         };
 
         window.handleCheckOut = async () => {
@@ -187,7 +244,7 @@
             const snap = await get(ref(db, 'members/' + activeUserId));
             const d = snap.val();
             await update(ref(db, 'members/' + activeUserId), { total_spent: (d.total_spent || 0) + (tech + prod), stamps: Math.min((d.stamps || 0) + 1, 10) });
-            alert("結帳成功！");
+            alert("結帳完成");
         };
 
         window.handleBuyTicket = async () => {
@@ -215,9 +272,8 @@
             document.getElementById(`page-${pid}`).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if(pid === 'member') document.getElementById('nav-member').classList.add('active');
-            else document.getElementById('nav-list').classList.add('active');
+            else { document.getElementById('nav-list').classList.add('active'); renderDirectory(); }
         };
     </script>
 </body>
 </html>
-
