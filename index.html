@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURUM | 奢華美髮私享境</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold-gradient: linear-gradient(135deg, #BF953F 0%, #FCF6BA 45%, #B38728 70%, #FBF5B7 85%, #AA771C 100%);
+            --dark-bg: #050505;
+        }
+        body {
+            background-color: var(--dark-bg);
+            color: #D4D4D4;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+        }
+        .gold-text { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Cinzel', serif; letter-spacing: 0.1em; }
+        .luxury-card { background: rgba(20, 20, 20, 0.7); border: 1px solid rgba(191, 149, 63, 0.2); backdrop-filter: blur(15px); border-radius: 24px; position: relative; overflow: hidden; animation: breathe 5s ease-in-out infinite; }
+        @keyframes breathe { 0%, 100% { box-shadow: 0 0 20px rgba(0,0,0,0.5); } 50% { box-shadow: 0 0 40px rgba(191,149,63,0.15); } }
+        .luxury-card::after { content: ""; position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(135deg, transparent 45%, rgba(255,255,255,0.05) 50%, transparent 55%); pointer-events: none; transition: all 0.8s ease; }
+        .luxury-card:active::after { top: 100%; left: 100%; }
+        .btn-gold { border: 1px solid rgba(191, 149, 63, 0.4); background: rgba(255,255,255,0.03); transition: all 0.3s; }
+        .btn-gold:hover { background: rgba(191, 149, 63, 0.1); }
+    </style>
+</head>
+<body class="flex flex-col items-center py-12 px-6">
+
+    <header class="text-center mb-12">
+        <h1 class="text-4xl gold-text font-bold mb-2">AURUM</h1>
+        <p class="text-[10px] tracking-[0.4em] text-gray-500 uppercase">Automated Privilege System</p>
+    </header>
+
+    <main class="w-full max-w-md space-y-6">
+        
+        <section class="luxury-card p-6">
+            <h3 class="gold-text text-xs tracking-widest mb-4">ACTIVE BUNDLES</h3>
+            <div id="bundle-list" class="space-y-4">
+                </div>
+        </section>
+
+        <section class="luxury-card p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h2 id="tier-name" class="text-2xl gold-text">SILVER</h2>
+                <div class="text-right">
+                    <span class="text-[10px] text-gray-500 uppercase">Bonus Points</span>
+                    <p id="points-balance" class="text-lg text-white">0 P</p>
+                </div>
+            </div>
+            <div class="w-full h-1 bg-gray-900 rounded-full mb-2">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-[#BF953F] to-[#FCF6BA] rounded-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+            <p id="next-tier-msg" class="text-[10px] text-gray-400 italic mb-4"></p>
+
+            <div class="mt-4 p-3 bg-black/40 rounded-lg border border-white/5">
+                <div class="flex justify-between text-[11px] mb-1">
+                    <span>本次預計消費</span>
+                    <span id="preview-cost">$2,000</span>
+                </div>
+                <div class="flex justify-between text-[11px] text-yellow-600 font-medium">
+                    <span>最大點數折抵 (10P=$1)</span>
+                    <span id="max-discount">-$0</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="luxury-card p-6 border-dashed border-[#BF953F]/40">
+            <p class="text-[10px] text-gray-500 text-center uppercase mb-4">Staff Console (Simulation)</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="handleBundleCheckin('haircut_5')" class="btn-gold py-3 rounded-xl text-[11px]">核銷剪髮次數包</button>
+                <button onclick="handleInfiniteCheckin('wash_unlimited')" class="btn-gold py-3 rounded-xl text-[11px]">洗頭吃到飽核銷</button>
+                <button onclick="handlePurchase(5000)" class="btn-gold py-3 rounded-xl text-[11px] col-span-2">一般結帳 $5,000 (自動升等/點數)</button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = { /* 您的配置 */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const userId = "VIP_USER_001";
+        const userRef = doc(db, "customers", userId);
+        const TIER_RULES = { SILVER: 10000, GOLD: 30000, PLATINUM: 999999 };
+        const POINT_EXCHANGE_RATE = 10; // 10點抵1元
+
+        onSnapshot(userRef, (snap) => {
+            if (snap.exists()) renderUI(snap.data());
+            else setInitialData();
+        });
+
+        function renderUI(data) {
+            // 1. 更新等級與進度
+            document.getElementById('tier-name').innerText = data.tier;
+            document.getElementById('points-balance').innerText = `${data.points || 0} P`;
+            const limit = TIER_RULES[data.tier] || 10000;
+            const progress = (data.total_spent / limit) * 100;
+            document.getElementById('progress-bar').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('next-tier-msg').innerText = `距下級還差 $${Math.max(0, limit - data.total_spent).toLocaleString()}`;
+
+            // 2. 更新折抵預覽 (假設消費2000)
+            const maxDiscount = Math.floor((data.points || 0) / POINT_EXCHANGE_RATE);
+            document.getElementById('max-discount').innerText = `-$${maxDiscount}`;
+
+            // 3. 更新次數包列表
+            const bundleContainer = document.getElementById('bundle-list');
+            bundleContainer.innerHTML = '';
+            
+            // 吃到飽顯示
+            if(data.infinite_wash) {
+                bundleContainer.innerHTML += `
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-yellow-700/20">
+                        <span class="text-sm">洗頭吃到飽</span>
+                        <span class="text-[10px] bg-yellow-700/30 px-2 py-1 rounded text-yellow-200">ACTIVE</span>
+                    </div>`;
+            }
+
+            // 次數包顯示
+            if(data.bundle_haircut) {
+                const count = data.bundle_haircut.remaining;
+                bundleContainer.innerHTML += `
+                    <div class="p-3 bg-white/5 rounded-xl border border-white/5">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>5 次剪髮方案</span>
+                            <span class="gold-text">${count} 次剩餘</span>
+                        </div>
+                        <div class="flex gap-1">
+                            ${Array(5).fill(0).map((_, i) => `<div class="h-1 flex-1 ${i < 5-count ? 'bg-yellow-700/50' : 'bg-yellow-400'} rounded-full"></div>`).join('')}
+                        </div>
+                        ${count === 1 ? '<p class="text-[9px] text-red-500 mt-2">⚠️ 最後一次！下回續約享 8 折</p>' : ''}
+                    </div>`;
+            }
+        }
+
+        // --- 核銷自動化邏輯 ---
+
+        window.handleBundleCheckin = async (type) => {
+            const snap = await getDoc(userRef);
+            const data = snap.data();
+            if (data.bundle_haircut.remaining > 0) {
+                let newCount = data.bundle_haircut.remaining - 1;
+                await updateDoc(userRef, { "bundle_haircut.remaining": newCount });
+                alert(`核銷成功！剩餘 ${newCount} 次。`);
+                if(newCount === 1) alert("系統自動發送：續約優惠通知");
+            }
+        };
+
+        window.handleInfiniteCheckin = async (type) => {
+            alert("吃到飽核銷成功！系統已自動紀錄設計師業績 (不扣費)");
+            // 這裡會另外寫入一個 performance_logs 集合紀錄設計師 ID 與 顧客 ID
+        };
+
+        window.handlePurchase = async (amount) => {
+            const snap = await getDoc(userRef);
+            const data = snap.data();
+            let newSpent = data.total_spent + amount;
+            let newPoints = (data.points || 0) + Math.floor(amount / 10); // 10元集1點
+            let newTier = data.tier;
+
+            // 自動升等邏輯 (12個月窗口邏輯通常由 Cloud Functions 處理，此處為簡化版)
+            if (newSpent >= TIER_RULES[data.tier]) {
+                newTier = data.tier === 'SILVER' ? 'GOLD' : 'PLATINUM';
+                alert(`恭喜！系統自動偵測符合資格，您已升等為 ${newTier}！`);
+            }
+
+            await updateDoc(userRef, { 
+                total_spent: newSpent, 
+                points: newPoints, 
+                tier: newTier 
+            });
+        };
+
+        async function setInitialData() {
+            await setDoc(userRef, {
+                total_spent: 5000,
+                tier: 'SILVER',
+                points: 1500,
+                infinite_wash: true,
+                bundle_haircut: { remaining: 3, total: 5 }
+            });
+        }
+    </script>
+</body>
+</html>
